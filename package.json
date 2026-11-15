@@ -1,0 +1,1 @@
+{"description":"Free-model aggregator: OpenAI and Anthropic wires over OpenRouter free models","engines":{"node":">=22"},"name":"free-model-aggregator-02-entry","private":true,"type":"module","version":"1.0.0"}
