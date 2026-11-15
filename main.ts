@@ -33,9 +33,9 @@ import {
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-const MAX_ATTEMPTS = 3;
+const MAX_ATTEMPTS = 6;
 const UPSTREAM_TIMEOUT_MS = 25000;
-const RETRY_DELAY_MS = 400;
+const RETRY_DELAY_MS = 150;
 const POLL_DELAY_MS = 400;
 const REGISTER_ATTEMPTS = 5;
 
@@ -101,6 +101,16 @@ function trailHeaders(failures: UpstreamFailure[]): Record<string, string> {
   return { "x-makefun-upstream-failures": JSON.stringify(failures.slice(0, 8)) };
 }
 
+// Serve one prompt through the gateway, walking the rating ranking
+// downwards on every refusal (layered fallback). The client waits at
+// most 30 s per prompt, so the attempts are bounded to fit that window:
+// a refusal is normally fast (a 429/5xx answers in well under a second),
+// and six attempts plus the short retry delay still leave the prompt
+// servable inside the window, where three attempts lost a prompt on the
+// dev trial after its top models were refused. The 25 s per-attempt
+// timeout is kept: a slow first choice must not eat the whole window,
+// and a gateway refusal is a cassette entry, so the retry sequence
+// replays identically on the final's replay pass.
 async function servePrompt(
   need: Need,
   stream: boolean,
