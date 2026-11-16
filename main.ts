@@ -33,7 +33,7 @@ import {
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-const MAX_ATTEMPTS = 6;
+const MAX_ATTEMPTS = 8;
 const UPSTREAM_TIMEOUT_MS = 25000;
 const RETRY_DELAY_MS = 150;
 const POLL_DELAY_MS = 400;
